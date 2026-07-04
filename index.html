@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZIKO | Web Developer & Designer</title>
+    <meta name="description" content="ZIKO — Building modern, affordable websites for small businesses and individuals using React, Tailwind CSS, and Python.">
+    <meta property="og:title" content="ZIKO | Web Developer & Designer">
+    <meta property="og:description" content="Modern, affordable websites for small businesses and individuals.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#978897',
+                        secondary: '#494850',
+                        bg: '#2C2C34',
+                        'bg-dark': '#23232A',
+                        'bg-light': '#34343D',
+                        'bg-lighter': '#40404A',
+                        card: '#383842',
+                        'text-primary': '#FFFFFF',
+                        'text-secondary': '#E0E0E0',
+                        'text-muted': '#AAAAAA',
+                        success: '#3CB371',
+                        warning: '#F4A261',
+                        danger: '#E63946',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Manrope', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary: #978897;
+            --secondary: #494850;
+            --bg: #2C2C34;
+            --bg-dark: #23232A;
+            --bg-light: #34343D;
+            --card: #383842;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: #FFFFFF;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        .cursor-dot, .cursor-outline {
+            position: fixed;
+            top: 0; left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .cursor-dot { width: 8px; height: 8px; background-color: var(--primary); transition: width 0.2s, height 0.2s; }
+        .cursor-outline { width: 40px; height: 40px; border: 2px solid rgba(151, 136, 151, 0.5); transition: width 0.3s, height 0.3s, border-color 0.3s; }
+        .cursor-hover .cursor-dot { width: 12px; height: 12px; }
+        .cursor-hover .cursor-outline { width: 60px; height: 60px; border-color: rgba(151, 136, 151, 0.8); }
+
+        @media (pointer: coarse) {
+            .cursor-dot, .cursor-outline { display: none; }
+            body { cursor: auto; }
+        }
+
+        .scroll-progress {
+            position: fixed; top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), #b8a8b8);
+            z-index: 9999; transition: width 0.1s;
+        }
+
+        .loading-screen {
+            position: fixed; inset: 0;
+            background: var(--bg-dark); z-index: 10000;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        .loading-screen.hidden { opacity: 0; visibility: hidden; }
+        .loader {
+            width: 60px; height: 60px;
+            border: 3px solid rgba(151, 136, 151, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .hero-gradient {
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(151, 136, 151, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(73, 72, 80, 0.4) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(151, 136, 151, 0.1) 0%, transparent 50%);
+        }
+
+        .glow-btn {
+            position: relative; overflow: hidden; transition: all 0.3s ease;
+        }
+        .glow-btn::before {
+            content: ''; position: absolute; inset: -2px;
+            background: linear-gradient(45deg, var(--primary), transparent, var(--primary));
+            border-radius: inherit; z-index: -1; opacity: 0; transition: opacity 0.3s;
+        }
+        .glow-btn:hover::before { opacity: 1; }
+        .glow-btn:hover {
+            box-shadow: 0 0 30px rgba(151, 136, 151, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .glass-card {
+            background: rgba(56, 56, 66, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(151, 136, 151, 0.1);
+            transition: all 0.4s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(151, 136, 151, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(151, 136, 151, 0.1);
+        }
+
+        .reveal {
+            opacity: 0; transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+        .reveal-delay-5 { transition-delay: 0.5s; }
+
+        .floating-shape {
+            position: absolute; border-radius: 50%;
+            filter: blur(60px); opacity: 0.4; pointer-events: none;
+        }
+
+        .progress-bar {
+            height: 6px; background: rgba(151, 136, 151, 0.2);
+            border-radius: 3px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #b8a8b8);
+            border-radius: 3px; width: 0;
+            transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .accordion-content {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+        }
+        .accordion-item.active .accordion-content { max-height: 500px; }
+        .accordion-item.active .accordion-icon { transform: rotate(180deg); }
+
+        .portfolio-item { transition: all 0.4s ease; }
+        .portfolio-item.hidden { display: none; }
+        .portfolio-item.fade { opacity: 0; transform: scale(0.9); }
+
+        .form-input {
+            background: rgba(56, 56, 66, 0.5);
+            border: 1px solid rgba(151, 136, 151, 0.2);
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(151, 136, 151, 0.1);
+            outline: none;
+        }
+
+        .ripple {
+            position: absolute; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+        @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+        .nav-blur { backdrop-filter: blur(20px); background: rgba(35, 35, 42, 0.85); }
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .mobile-menu.open { transform: translateX(0); }
+
+        .pricing-highlight {
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 40px rgba(151, 136, 151, 0.15);
+            position: relative; overflow: hidden;
+        }
+        .pricing-highlight::before {
+            content: 'Best Value';
+            position: absolute; top: 12px; right: -35px;
+            background: var(--primary); color: white;
+            padding: 4px 40px; font-size: 11px; font-weight: 600;
+            transform: rotate(45deg);
+        }
+
+        .toast {
+            position: fixed; bottom: 30px; right: 30px;
+            background: var(--card);
+            border: 1px solid rgba(151, 136, 151, 0.2);
+            padding: 16px 24px; border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            z-index: 9998; transform: translateX(150%);
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .toast.show { transform: translateX(0); }
+
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px); z-index: 9995;
+            opacity: 0; visibility: hidden; transition: all 0.3s;
+        }
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+        .modal-content {
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .modal-overlay.open .modal-content { transform: scale(1) translateY(0); }
+
+        .badge {
+            display: inline-flex; align-items: center;
+            padding: 4px 12px; border-radius: 9999px;
+            font-size: 12px; font-weight: 500;
+            background: rgba(151, 136, 151, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(151, 136, 151, 0.2);
+        }
+
+        .counter { font-variant-numeric: tabular-nums; }
+
+        .social-icon { transition: all 0.3s ease; }
+        .social-icon:hover { color: var(--primary); transform: translateY(-3px); }
+
+        .back-to-top {
+            opacity: 0; visibility: hidden; transition: all 0.3s;
+        }
+        .back-to-top.visible { opacity: 1; visibility: visible; }
+
+        .hamburger-line { transition: all 0.3s ease; }
+        .hamburger.open .hamburger-line:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.open .hamburger-line:nth-child(2) { opacity: 0; }
+        .hamburger.open .hamburger-line:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .skip-link {
+            position: absolute; top: -40px; left: 0;
+            background: var(--primary); color: white;
+            padding: 8px 16px; z-index: 10001; transition: top 0.3s;
+        }
+        .skip-link:focus { top: 0; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        ::selection { background: rgba(151, 136, 151, 0.3); color: white; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-float-delayed { animation: float 6s ease-in-out 2s infinite; }
+        .animate-float-slow { animation: float 8s ease-in-out 1s infinite; }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #978897; }
+        }
+        .typing-text {
+            overflow: hidden; border-right: 2px solid var(--primary);
+            white-space: nowrap;
+            animation: typing 3.5s steps(30, end), blink-caret 0.75s step-end infinite;
+            width: 0; display: inline-block;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .reveal { opacity: 1; transform: none; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="bg-bg-dark text-white antialiased">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <div class="loading-screen" id="loadingScreen" role="status" aria-label="Loading">
+        <div class="loader mb-6"></div>
+        <p class="text-primary font-heading text-lg tracking-wider">Loading...</p>
+    </div>
+
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-outline" id="cursorOutline"></div>
+    <div class="scroll-progress" id="scrollProgress" role="progressbar" aria-label="Scroll progress"></div>
+
+    <div class="toast" id="toast" role="alert" aria-live="polite">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <span id="toastMessage" class="text-sm font-medium">Message sent!</span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-500" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <a href="#" class="flex items-center gap-3 group" aria-label="Home">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                        <span class="font-heading font-bold text-white text-lg">Z</span>
+                    </div>
+                    <span class="font-heading font-bold text-xl hidden sm:block">ZIKO</span>
+                </a>
+
+                <div class="hidden lg:flex items-center gap-8">
+                    <a href="#home" class="nav-link text-sm font-medium text-text-secondary hover:text-white transition-colors relative group">
+                        Home<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#about" class="nav-link text-sm font-medium text-text-secondary hover:text-white transition-colors relative group">
+                        About<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#services" class="nav-link text-sm font-medium text-text-secondary hover:text-white transition-colors relative group">
+                        Services<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#pricing" class="nav-link text-sm font-medium text-text-secondary hover:text-white transition-colors relative group">
+                        Pricing<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#faq" class="nav-link text-sm font-medium text-text-secondary hover:text-white transition-colors relative group">
+                        FAQ<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#contact" class="nav-link text-sm font-medium text-text-secondary hover:text-white transition-colors relative group">
+                        Contact<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                </div>
+
+                <div class="hidden lg:flex items-center gap-4">
+                    <a href="#contact" class="glow-btn px-6 py-2.5 bg-primary text-white rounded-full text-sm font-semibold hover:bg-opacity-90 transition-all">Get a Quote</a>
+                </div>
+
+                <button class="hamburger lg:hidden flex flex-col gap-1.5 p-2" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+                    <span class="hamburger-line w-6 h-0.5 bg-white rounded-full"></span>
+                    <span class="hamburger-line w-6 h-0.5 bg-white rounded-full"></span>
+                    <span class="hamburger-line w-6 h-0.5 bg-white rounded-full"></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="mobile-menu fixed top-0 right-0 w-80 h-full bg-bg-dark border-l border-white/10 lg:hidden" id="mobileMenu">
+            <div class="p-8 pt-24">
+                <div class="flex flex-col gap-6">
+                    <a href="#home" class="text-lg font-medium text-text-secondary hover:text-white transition-colors" onclick="closeMobileMenu()">Home</a>
+                    <a href="#about" class="text-lg font-medium text-text-secondary hover:text-white transition-colors" onclick="closeMobileMenu()">About</a>
+                    <a href="#services" class="text-lg font-medium text-text-secondary hover:text-white transition-colors" onclick="closeMobileMenu()">Services</a>
+                    <a href="#pricing" class="text-lg font-medium text-text-secondary hover:text-white transition-colors" onclick="closeMobileMenu()">Pricing</a>
+                    <a href="#faq" class="text-lg font-medium text-text-secondary hover:text-white transition-colors" onclick="closeMobileMenu()">FAQ</a>
+                    <a href="#contact" class="text-lg font-medium text-text-secondary hover:text-white transition-colors" onclick="closeMobileMenu()">Contact</a>
+                    <hr class="border-white/10">
+                    <a href="#contact" class="glow-btn px-6 py-3 bg-primary text-white rounded-full text-center font-semibold" onclick="closeMobileMenu()">Get a Quote</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+
+        <!-- Hero Section -->
+        <section id="home" class="relative min-h-screen flex items-center hero-gradient overflow-hidden pt-20">
+            <div class="floating-shape w-96 h-96 bg-primary/20 -top-20 -left-20 animate-float"></div>
+            <div class="floating-shape w-72 h-72 bg-secondary/30 top-1/3 right-0 animate-float-delayed"></div>
+            <div class="floating-shape w-64 h-64 bg-primary/10 bottom-20 left-1/3 animate-float-slow"></div>
+            <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 50px 50px;"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="text-center lg:text-left">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6 reveal">
+                            <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+                            <span class="text-sm text-primary font-medium">Now booking new projects</span>
+                        </div>
+
+                        <h1 class="font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight mb-6 reveal reveal-delay-1">
+                            Modern Websites<br>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-white">Made Simple</span><br>
+                            & Affordable
+                        </h1>
+
+                        <div class="h-8 mb-8 reveal reveal-delay-2">
+                            <span class="text-xl text-text-secondary font-display">
+                                <span class="typing-text" id="typingText">React, Tailwind & Python Developer</span>
+                            </span>
+                        </div>
+
+                        <p class="text-text-secondary text-lg mb-10 max-w-xl mx-auto lg:mx-0 reveal reveal-delay-2">
+                            I build clean, fast, modern websites for small businesses and individuals — with introductory pricing that's well below the usual market rate. No corporate jargon, no fake promises, just honest work.
+                        </p>
+
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12 reveal reveal-delay-3">
+                            <a href="#contact" class="glow-btn px-8 py-4 bg-primary text-white rounded-full font-semibold text-center inline-flex items-center justify-center gap-2 hover:gap-3 transition-all">
+                                <span>Get a Free Quote</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                            </a>
+                            <a href="#about" class="px-8 py-4 border border-white/20 rounded-full font-semibold text-center hover:bg-white/5 transition-all inline-flex items-center justify-center gap-2">
+                                <span>Learn More</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            </a>
+                        </div>
+
+                        <div class="flex flex-wrap gap-6 justify-center lg:justify-start reveal reveal-delay-4">
+                            <div class="flex items-center gap-2 text-sm text-text-muted">
+                                <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>Clean, Modern Code</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-text-muted">
+                                <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                <span>Fast Delivery</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-text-muted">
+                                <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>Unbeatable Launch Pricing</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative hidden lg:block reveal reveal-delay-3">
+                        <div class="relative w-full aspect-square max-w-lg mx-auto">
+                            <div class="absolute -inset-4 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl transform rotate-3"></div>
+                            <div class="absolute inset-0 bg-card rounded-3xl border border-white/10 p-8 transform -rotate-3 shadow-2xl">
+                                <div class="space-y-4">
+                                    <div class="flex items-center gap-2 mb-6">
+                                        <div class="w-3 h-3 rounded-full bg-danger"></div>
+                                        <div class="w-3 h-3 rounded-full bg-warning"></div>
+                                        <div class="w-3 h-3 rounded-full bg-success"></div>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="h-4 bg-white/10 rounded w-3/4"></div>
+                                        <div class="h-4 bg-white/10 rounded w-1/2"></div>
+                                        <div class="h-4 bg-primary/30 rounded w-5/6"></div>
+                                        <div class="h-4 bg-white/10 rounded w-2/3"></div>
+                                        <div class="h-4 bg-white/10 rounded w-4/5"></div>
+                                        <div class="h-4 bg-primary/30 rounded w-3/4"></div>
+                                        <div class="h-4 bg-white/10 rounded w-1/2"></div>
+                                    </div>
+                                    <div class="mt-8 p-4 bg-primary/10 rounded-xl border border-primary/20">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                            </div>
+                                            <div>
+                                                <div class="h-3 bg-white/20 rounded w-24 mb-1"></div>
+                                                <div class="h-2 bg-white/10 rounded w-16"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="absolute -top-4 -right-4 w-20 h-20 bg-primary/20 rounded-2xl backdrop-blur-xl border border-primary/30 flex items-center justify-center animate-float">
+                                <svg class="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                            </div>
+                            <div class="absolute -bottom-4 -left-4 w-20 h-20 bg-secondary/30 rounded-2xl backdrop-blur-xl border border-white/10 flex items-center justify-center animate-float-delayed">
+                                <svg class="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+                <svg class="w-6 h-6 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </div>
+        </section>
+
+        <!-- Founding Client Strip -->
+        <section class="py-20 relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="glass-card rounded-2xl p-8 text-center reveal">
+                        <div class="text-4xl lg:text-5xl font-heading font-bold text-primary mb-2">
+                            <span class="counter" data-target="15">0</span>+
+                        </div>
+                        <p class="text-text-muted text-sm">Technologies I Use Daily</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8 text-center reveal reveal-delay-1">
+                        <div class="text-4xl lg:text-5xl font-heading font-bold text-primary mb-2">
+                            <span class="counter" data-target="24">0</span>h
+                        </div>
+                        <p class="text-text-muted text-sm">Typical Response Time</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8 text-center reveal reveal-delay-2">
+                        <div class="text-4xl lg:text-5xl font-heading font-bold text-primary mb-2">
+                            <span class="counter" data-target="100">0</span>%
+                        </div>
+                        <p class="text-text-muted text-sm">Effort On Every Build</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8 text-center reveal reveal-delay-3">
+                        <div class="text-4xl lg:text-5xl font-heading font-bold text-primary mb-2">£50</div>
+                        <p class="text-text-muted text-sm">Founding Client Rate</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-24 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-16 items-center">
+                    <div class="relative reveal">
+                        <div class="absolute -inset-4 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl transform rotate-2"></div>
+                        <div class="relative bg-card rounded-2xl overflow-hidden border border-white/10 aspect-[4/5] flex items-center justify-center p-10">
+                            <div class="absolute inset-0 opacity-[0.06]" style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 28px 28px;"></div>
+                            <div class="relative z-10 text-center">
+                                <div class="w-28 h-28 rounded-3xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mx-auto mb-6 shadow-2xl">
+                                    <span class="font-heading font-bold text-white text-5xl">Z</span>
+                                </div>
+                                <h3 class="font-heading font-bold text-2xl mb-2">ZIKO</h3>
+                                <p class="text-text-muted text-sm mb-6">Web Developer & Designer</p>
+                                <div class="flex flex-wrap justify-center gap-2">
+                                    <span class="badge text-xs">React</span>
+                                    <span class="badge text-xs">Tailwind</span>
+                                    <span class="badge text-xs">Python</span>
+                                </div>
+                            </div>
+                            <div class="absolute bottom-6 left-6 right-6 z-10">
+                                <div class="glass-card rounded-xl p-4">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-sm">Available Now</p>
+                                            <p class="text-text-muted text-xs">Open for new projects</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="reveal">
+                            <span class="text-primary text-sm font-semibold tracking-wider uppercase mb-4 block">About Me</span>
+                            <h2 class="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl mb-6">
+                                Driven by Code,<br><span class="text-primary">Fueled by Passion</span>
+                            </h2>
+                        </div>
+
+                        <div class="space-y-4 text-text-secondary reveal reveal-delay-1">
+                            <p>
+                                I'm a web developer who loves turning ideas into real, working websites. My stack is modern and practical — React for interactive interfaces, Tailwind CSS for clean styling, and Python for solid backend logic — and I focus on what matters: clean code, fast load times, and designs that actually help your business grow.
+                            </p>
+                            <p>
+                                My rates reflect where I am early in my career, not the quality of the work — so you get the same level of care and attention as a much pricier agency, at a fraction of the cost.
+                            </p>
+                            <p>
+                                Whether you're a small business owner, a freelancer, or someone with a great idea, I'm here to help you get online quickly, affordably, and with clear communication the whole way through.
+                            </p>
+                        </div>
+
+                        <div class="grid sm:grid-cols-2 gap-4 mt-8 reveal reveal-delay-2">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Fast & Responsive</h4>
+                                    <p class="text-text-muted text-sm">Sites that work perfectly on every device</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Honest, Founding-Client Pricing</h4>
+                                    <p class="text-text-muted text-sm">Rates this low won't last once my portfolio grows</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Clear Communication</h4>
+                                    <p class="text-text-muted text-sm">No jargon, just straightforward updates</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Ongoing Support</h4>
+                                    <p class="text-text-muted text-sm">Monthly maintenance keeps you covered</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-10 flex flex-wrap gap-4 reveal reveal-delay-3">
+                            <a href="#contact" class="glow-btn px-8 py-3 bg-primary text-white rounded-full font-semibold inline-flex items-center gap-2">
+                                <span>Get a Quote</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                            </a>
+                            <a href="#skills" class="px-8 py-3 border border-white/20 rounded-full font-semibold hover:bg-white/5 transition-all inline-flex items-center gap-2">
+                                <span>See My Skills</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="py-24 relative bg-bg/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 reveal">
+                    <span class="text-primary text-sm font-semibold tracking-wider uppercase mb-4 block">My Toolkit</span>
+                    <h2 class="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl mb-4">Skills & Technologies</h2>
+                    <p class="text-text-secondary max-w-2xl mx-auto">The modern tools I use to bring your ideas to life.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="glass-card rounded-2xl p-8 reveal">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <h3 class="font-heading font-bold text-xl">Frontend</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div><div class="flex justify-between mb-1"><span class="text-sm font-medium">HTML5 / CSS3</span><span class="text-sm text-primary">95%</span></div><div class="progress-bar"><div class="progress-fill" data-width="95"></div></div></div>
+                            <div><div class="flex justify-between mb-1"><span class="text-sm font-medium">JavaScript (ES6+)</span><span class="text-sm text-primary">90%</span></div><div class="progress-bar"><div class="progress-fill" data-width="90"></div></div></div>
+                            <div><div class="flex justify-between mb-1"><span class="text-sm font-medium">React</span><span class="text-sm text-primary">88%</span></div><div class="progress-bar"><div class="progress-fill" data-width="88"></div></div></div>
+                            <div><div class="flex justify-between mb-1"><span class="text-sm font-medium">Tailwind CSS</span><span class="text-sm text-primary">92%</span></div><div class="progress-bar"><div class="progress-fill" data-width="92"></div></div></div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-8 reveal reveal-delay-1">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+                            </div>
+                            <h3 class="font-heading font-bold text-xl">Backend</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div><div class="flex justify-between mb-1"><span class="text-sm font-medium">Python</span><span class="text-sm text-primary">85%</span></div><div class="progress-bar"><div class="progress-fill" data-width="85"></div></div></div>
+                            <div><div class="flex justify-between mb-1"><span class="text-sm font-medium">Flask / Django</span><span class="text-sm text-primary">80%</span></div><div class="progress-bar"><div class="progress-fill" data-width="80"></div></div></div>
+                            <div><div class="flex justify-between mb-1"><span class="text-sm font-medium">Node.js</span><span class="text-sm text-primary">75%</span></div><div class="progress-bar"><div class="progress-fill" data-width="75"></div></div></div>
+                            <div><div class="flex justify-between mb-1"><span class="text-sm font-medium">REST APIs</span><span class="text-sm text-primary">82%</span></div><div class="progress-bar"><div class="progress-fill" data-width="82"></div></div></div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-8 reveal reveal-delay-2">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </div>
+                            <h3 class="font-heading font-bold text-xl">Tools & Design</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div><div class="flex justify-between mb-1"><span class="text-sm font-medium">Git / GitHub</span><span class="text-sm text-primary">90%</span></div><div class="progress-bar"><div class="progress-fill" data-width="90"></div></div></div>
+                            <div><div class="flex justify-between mb-1"><span class="text-sm font-medium">Figma</span><span class="text-sm text-primary">85%</span></div><div class="progress-bar"><div class="progress-fill" data-width="85"></div></div></div>
+                            <div><div class="flex justify-between mb-1"><span class="text-sm font-medium">VS Code</span><span class="text-sm text-primary">95%</span></div><div class="progress-bar"><div class="progress-fill" data-width="95"></div></div></div>
+                            <div><div class="flex justify-between mb-1"><span class="text-sm font-medium">Vercel / Netlify</span><span class="text-sm text-primary">88%</span></div><div class="progress-bar"><div class="progress-fill" data-width="88"></div></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 flex flex-wrap justify-center gap-3 reveal">
+                    <span class="badge">React</span>
+                    <span class="badge">Tailwind CSS</span>
+                    <span class="badge">JavaScript</span>
+                    <span class="badge">Python</span>
+                    <span class="badge">Flask</span>
+                    <span class="badge">Django</span>
+                    <span class="badge">HTML5</span>
+                    <span class="badge">CSS3</span>
+                    <span class="badge">Git</span>
+                    <span class="badge">GitHub</span>
+                    <span class="badge">Figma</span>
+                    <span class="badge">Vercel</span>
+                    <span class="badge">Node.js</span>
+                    <span class="badge">REST APIs</span>
+                    <span class="badge">Responsive Design</span>
+                </div>
+
+                <p class="text-center text-text-muted text-sm mt-8 max-w-xl mx-auto reveal">Note to self: swap these percentages for an honest self-rating before publishing — visitors can't verify them, so keep them realistic.</p>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="py-24 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 reveal">
+                    <span class="text-primary text-sm font-semibold tracking-wider uppercase mb-4 block">What I Offer</span>
+                    <h2 class="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl mb-4">Services</h2>
+                    <p class="text-text-secondary max-w-2xl mx-auto">Straightforward services designed to get your business online quickly and affordably.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="glass-card rounded-2xl p-8 group reveal">
+                        <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
+                            <svg class="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        </div>
+                        <h3 class="font-heading font-bold text-xl mb-3">Business Websites</h3>
+                        <p class="text-text-secondary text-sm mb-4">Professional websites for small businesses, tradespeople, and local services. Clean, fast, and built to bring in customers.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Up to 5 pages</li>
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Mobile responsive</li>
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Contact form</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-8 group reveal reveal-delay-1">
+                        <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
+                            <svg class="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        </div>
+                        <h3 class="font-heading font-bold text-xl mb-3">Portfolio Sites</h3>
+                        <p class="text-text-secondary text-sm mb-4">Showcase your work with a stunning personal portfolio. Perfect for creatives, freelancers, and job seekers.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Custom design</li>
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Project gallery</li>
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Social links</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-8 group reveal reveal-delay-2">
+                        <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
+                            <svg class="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        </div>
+                        <h3 class="font-heading font-bold text-xl mb-3">Landing Pages</h3>
+                        <p class="text-text-secondary text-sm mb-4">High-impact single-page sites designed to convert visitors into leads or customers.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Call-to-action focus</li>
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Fast loading</li>
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>SEO ready</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-8 group reveal">
+                        <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
+                            <svg class="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        </div>
+                        <h3 class="font-heading font-bold text-xl mb-3">Website Redesign</h3>
+                        <p class="text-text-secondary text-sm mb-4">Give your existing site a fresh, modern look. I keep what works and fix what doesn't.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Modern refresh</li>
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Speed boost</li>
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Mobile fix</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-8 group reveal reveal-delay-1">
+                        <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
+                            <svg class="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <h3 class="font-heading font-bold text-xl mb-3">Small Web Apps</h3>
+                        <p class="text-text-secondary text-sm mb-4">Simple interactive tools, calculators, or dashboards built with React and Python.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Interactive features</li>
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Data handling</li>
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>User-friendly UI</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-8 group reveal reveal-delay-2">
+                        <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
+                            <svg class="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h3 class="font-heading font-bold text-xl mb-3">Monthly Maintenance</h3>
+                        <p class="text-text-secondary text-sm mb-4">Keep your site secure, updated, and running smoothly. First month is FREE with any build.</p>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Security updates</li>
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Content changes</li>
+                            <li class="flex items-center gap-2 text-sm text-text-muted"><svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Performance checks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Process Section (replaces fake portfolio/testimonials) -->
+        <section id="process" class="py-24 relative bg-bg/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 reveal">
+                    <span class="text-primary text-sm font-semibold tracking-wider uppercase mb-4 block">How We'd Work Together</span>
+                    <h2 class="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl mb-4">A Simple, Transparent Process</h2>
+                    <p class="text-text-secondary max-w-2xl mx-auto">Here's exactly how a project runs, step by step, so there are no surprises along the way.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="glass-card rounded-2xl p-8 reveal">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 font-heading font-bold text-primary">1</div>
+                        <h3 class="font-heading font-bold text-lg mb-2">Free Quote Call</h3>
+                        <p class="text-text-muted text-sm">We talk through what you need. No pressure, no obligation — if it's not a fit, I'll say so.</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8 reveal reveal-delay-1">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 font-heading font-bold text-primary">2</div>
+                        <h3 class="font-heading font-bold text-lg mb-2">Design Draft</h3>
+                        <p class="text-text-muted text-sm">You see a real preview before I write a line of final code, so you can request changes early.</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8 reveal reveal-delay-2">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 font-heading font-bold text-primary">3</div>
+                        <h3 class="font-heading font-bold text-lg mb-2">Build & Review</h3>
+                        <p class="text-text-muted text-sm">I build it, you review it, we revise together until it's right — with daily updates, not radio silence.</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8 reveal reveal-delay-3">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 font-heading font-bold text-primary">4</div>
+                        <h3 class="font-heading font-bold text-lg mb-2">Launch & Support</h3>
+                        <p class="text-text-muted text-sm">Site goes live, you get the full source code, and your first month of maintenance is free.</p>
+                    </div>
+                </div>
+
+                <div class="mt-12 glass-card rounded-2xl p-8 md:p-10 text-center reveal">
+                    <h3 class="font-heading font-bold text-2xl mb-3">Lock In Launch Pricing</h3>
+                    <p class="text-text-secondary max-w-2xl mx-auto mb-6">These rates won't stay this low forever. If anything about the final site isn't right, I'll fix it — free, until you're happy.</p>
+                    <a href="#contact" class="glow-btn inline-flex px-8 py-4 bg-primary text-white rounded-full font-semibold items-center gap-2">
+                        <span>Claim Founding-Client Pricing</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="py-24 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 reveal">
+                    <span class="text-primary text-sm font-semibold tracking-wider uppercase mb-4 block">Simple Pricing</span>
+                    <h2 class="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl mb-4">Affordable & Clear</h2>
+                    <p class="text-text-secondary max-w-2xl mx-auto">No hidden fees. No surprises. Launch pricing well below typical market rates.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <!-- Website Build -->
+                    <div class="glass-card rounded-2xl p-8 reveal">
+                        <div class="text-center mb-8">
+                            <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <h3 class="font-heading font-bold text-2xl mb-2">Website Build</h3>
+                            <p class="text-text-muted text-sm mb-6">One-time fee. You own everything.</p>
+                            <div class="flex items-baseline justify-center gap-1">
+                                <span class="text-lg text-text-muted">£</span>
+                                <span class="text-5xl font-heading font-bold">50</span>
+                            </div>
+                            <p class="text-text-muted text-sm mt-2">one-time payment</p>
+                        </div>
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Custom design tailored to your brand</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Up to 5 pages (Home, About, Services, etc.)</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Fully mobile responsive</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Contact form & social links</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Basic SEO setup</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Fast delivery (3-7 days)</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>You own 100% of the code</span>
+                            </li>
+                        </ul>
+                        <a href="#contact" class="glow-btn block w-full py-4 text-center bg-primary text-white rounded-full font-semibold text-lg">Get Started</a>
+                    </div>
+
+                    <!-- Maintenance (Highlighted) -->
+                    <div class="glass-card pricing-highlight rounded-2xl p-8 reveal reveal-delay-1">
+                        <div class="text-center mb-8">
+                            <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            </div>
+                            <h3 class="font-heading font-bold text-2xl mb-2">Monthly Maintenance</h3>
+                            <p class="text-text-muted text-sm mb-6">Keep your site running smoothly.</p>
+                            <div class="flex items-baseline justify-center gap-1">
+                                <span class="text-lg text-text-muted">£</span>
+                                <span class="text-5xl font-heading font-bold text-primary">30</span>
+                            </div>
+                            <p class="text-text-muted text-sm mt-2">per month</p>
+                            <div class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 border border-success/20">
+                                <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span class="text-success text-sm font-semibold">First month FREE with any build</span>
+                            </div>
+                        </div>
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Security & plugin updates</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Monthly performance check</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Content updates (text, images)</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Bug fixes & broken link checks</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Backup & recovery</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Priority email support</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Cancel anytime — no contract</span>
+                            </li>
+                        </ul>
+                        <a href="#contact" class="block w-full py-4 text-center border border-white/20 rounded-full font-semibold text-lg hover:bg-white/5 transition-all">Add Maintenance</a>
+                    </div>
+                </div>
+
+                <div class="text-center mt-12 reveal">
+                    <p class="text-text-muted text-sm max-w-xl mx-auto">Need something more complex? <a href="#contact" class="text-primary hover:underline">Get in touch</a> and I'll give you a custom quote — no pressure, no obligation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="py-24 relative bg-bg/30">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 reveal">
+                    <span class="text-primary text-sm font-semibold tracking-wider uppercase mb-4 block">FAQ</span>
+                    <h2 class="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl mb-4">Common Questions</h2>
+                    <p class="text-text-secondary max-w-2xl mx-auto">Quick answers to the things people usually ask.</p>
+                </div>
+
+                <div class="space-y-4" id="faqContainer">
+                    <div class="accordion-item glass-card rounded-xl overflow-hidden reveal">
+                        <button class="accordion-trigger w-full flex items-center justify-between p-6 text-left" onclick="toggleAccordion(this)">
+                            <span class="font-semibold text-lg">Can I see examples of your work?</span>
+                            <svg class="accordion-icon w-5 h-5 text-primary transition-transform duration-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="accordion-content px-6">
+                            <p class="text-text-secondary pb-6">My portfolio is still growing, so I can't point you to a long list of past sites yet. What I can offer instead is full transparency in how I work, fast turnaround, and pricing that reflects where I am in my career right now — which is exactly why it's this competitive.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item glass-card rounded-xl overflow-hidden reveal">
+                        <button class="accordion-trigger w-full flex items-center justify-between p-6 text-left" onclick="toggleAccordion(this)">
+                            <span class="font-semibold text-lg">What does the £30/month maintenance cover?</span>
+                            <svg class="accordion-icon w-5 h-5 text-primary transition-transform duration-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="accordion-content px-6">
+                            <p class="text-text-secondary pb-6">Maintenance covers security updates, performance monitoring, content changes (like updating text or swapping images), fixing any bugs that pop up, regular backups, and priority email support. Think of it as peace of mind — your site stays healthy while you focus on your business.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item glass-card rounded-xl overflow-hidden reveal">
+                        <button class="accordion-trigger w-full flex items-center justify-between p-6 text-left" onclick="toggleAccordion(this)">
+                            <span class="font-semibold text-lg">Is the first month of maintenance really free?</span>
+                            <svg class="accordion-icon w-5 h-5 text-primary transition-transform duration-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="accordion-content px-6">
+                            <p class="text-text-secondary pb-6">Yes, absolutely. When you pay the £50 build fee, you get the first month of maintenance completely free. That gives us time to iron out any small tweaks after launch and ensures you're happy with everything before any monthly payments begin.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item glass-card rounded-xl overflow-hidden reveal">
+                        <button class="accordion-trigger w-full flex items-center justify-between p-6 text-left" onclick="toggleAccordion(this)">
+                            <span class="font-semibold text-lg">Is there a contract or minimum commitment?</span>
+                            <svg class="accordion-icon w-5 h-5 text-primary transition-transform duration-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="accordion-content px-6">
+                            <p class="text-text-secondary pb-6">No contract at all. The £50 website build is a one-time fee with no strings attached. The £30/month maintenance is a rolling subscription — you can cancel anytime with no penalties. I believe in earning your business every month, not locking you in.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item glass-card rounded-xl overflow-hidden reveal">
+                        <button class="accordion-trigger w-full flex items-center justify-between p-6 text-left" onclick="toggleAccordion(this)">
+                            <span class="font-semibold text-lg">How long does it take to build the website?</span>
+                            <svg class="accordion-icon w-5 h-5 text-primary transition-transform duration-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="accordion-content px-6">
+                            <p class="text-text-secondary pb-6">Most standard business sites and portfolios are delivered within 3 to 7 days. If you need something more complex, I'll give you a realistic timeline upfront. I work fast because I use modern tools like React and Tailwind that let me build quickly without sacrificing quality.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item glass-card rounded-xl overflow-hidden reveal">
+                        <button class="accordion-trigger w-full flex items-center justify-between p-6 text-left" onclick="toggleAccordion(this)">
+                            <span class="font-semibold text-lg">Do I own the website once it's built?</span>
+                            <svg class="accordion-icon w-5 h-5 text-primary transition-transform duration-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="accordion-content px-6">
+                            <p class="text-text-secondary pb-6">Yes, 100%. Once the £50 build fee is paid, the entire website and all its code belong to you. I can help you set up your own hosting account, or if you prefer, I can host it for you as part of the maintenance plan. Either way, you own everything.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item glass-card rounded-xl overflow-hidden reveal">
+                        <button class="accordion-trigger w-full flex items-center justify-between p-6 text-left" onclick="toggleAccordion(this)">
+                            <span class="font-semibold text-lg">What if I need changes after the site is live?</span>
+                            <svg class="accordion-icon w-5 h-5 text-primary transition-transform duration-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="accordion-content px-6">
+                            <p class="text-text-secondary pb-6">If you're on the maintenance plan, small content changes (updating text, swapping images, adding a new page section) are included. For bigger changes or new features, I'll give you a fair quote before starting any work. No surprise bills.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-24 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 reveal">
+                    <span class="text-primary text-sm font-semibold tracking-wider uppercase mb-4 block">Get In Touch</span>
+                    <h2 class="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl mb-4">Let's Build Something</h2>
+                    <p class="text-text-secondary max-w-2xl mx-auto">Have a project in mind? Send me a message and I'll get back to you within 24 hours.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-5 gap-12">
+                    <div class="lg:col-span-2 space-y-8 reveal">
+                        <div class="glass-card rounded-2xl p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold mb-1">Email</h3>
+                                    <a href="mailto:ziko.createwebsites@gmail.com" class="text-text-secondary hover:text-primary transition-colors">ziko.createwebsites@gmail.com</a>
+                                    <p class="text-text-muted text-xs mt-1">Replace with your real email before publishing</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card rounded-2xl p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold mb-1">Response Time</h3>
+                                    <p class="text-text-secondary">Usually within 24 hours</p>
+                                    <span class="inline-flex items-center gap-1 text-success text-sm mt-1">
+                                        <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+                                        Currently accepting projects
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="lg:col-span-3 reveal">
+                        <form class="glass-card rounded-2xl p-8" action="https://formspree.io/f/mrewrwvz" method="POST" id="contactForm" onsubmit="handleContactSubmit(event)">
+                            <div class="grid sm:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label for="name" class="block text-sm font-medium mb-2">Name *</label>
+                                    <input type="text" id="name" name="name" required class="form-input w-full px-4 py-3 rounded-xl text-white placeholder-text-muted" placeholder="Your name">
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-medium mb-2">Email *</label>
+                                    <input type="email" id="email" name="email" required class="form-input w-full px-4 py-3 rounded-xl text-white placeholder-text-muted" placeholder="you@example.com">
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <label for="projectType" class="block text-sm font-medium mb-2">What do you need? *</label>
+                                <select id="projectType" name="projectType" required class="form-input w-full px-4 py-3 rounded-xl text-white">
+                                    <option value="" class="bg-card">Select a service</option>
+                                    <option value="business" class="bg-card">Business Website</option>
+                                    <option value="portfolio" class="bg-card">Portfolio Site</option>
+                                    <option value="landing" class="bg-card">Landing Page</option>
+                                    <option value="redesign" class="bg-card">Website Redesign</option>
+                                    <option value="other" class="bg-card">Something else</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-6">
+                                <label for="message" class="block text-sm font-medium mb-2">Tell me about your project *</label>
+                                <textarea id="message" name="message" rows="5" required class="form-input w-full px-4 py-3 rounded-xl text-white placeholder-text-muted resize-none" placeholder="What are you looking for? Any specific features or ideas?"></textarea>
+                            </div>
+
+                            <div class="mb-6 flex items-start gap-2.5">
+                                <input type="checkbox" id="termsAccept" name="termsAcceptedCheckbox" required
+                                    class="mt-0.5 w-4 h-4 rounded border-white/30 bg-transparent text-primary focus:ring-1 focus:ring-primary/50 accent-[#978897] cursor-pointer flex-shrink-0">
+                                <label for="termsAccept" class="text-xs text-text-muted leading-relaxed cursor-pointer select-none">
+                                    I have read and agree to the
+                                    <button type="button" onclick="openTermsModal(event)" class="text-primary hover:underline">Terms &amp; Conditions</button>.
+                                </label>
+                            </div>
+
+                            <!-- Hidden field: records the exact acceptance statement sent along with the enquiry -->
+                            <input type="hidden" name="termsAcceptance" id="termsAcceptanceField" value="">
+
+                            <button type="submit" class="glow-btn w-full py-4 bg-primary text-white rounded-xl font-semibold text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" id="submitBtn" disabled>
+                                <span>Send Message</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </button>
+                            <p class="text-[11px] text-text-muted text-center mt-3">By sending this message you confirm the details above and your acceptance of the Terms &amp; Conditions.</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 bg-bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                        <span class="font-heading font-bold text-white text-sm">Z</span>
+                    </div>
+                    <span class="font-heading font-bold text-lg">ZIKO</span>
+                </div>
+                <p class="text-text-muted text-sm text-center">Built with passion. No fake experience, just real code.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="text-text-muted hover:text-primary transition-colors text-sm">Privacy</a>
+                    <a href="#" class="text-text-muted hover:text-primary transition-colors text-sm">Terms</a>
+                </div>
+            </div>
+            <div class="border-t border-white/10 mt-8 pt-8 text-center">
+                <p class="text-text-muted text-sm">&copy; 2026 ZIKO. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <button class="back-to-top fixed bottom-8 right-8 w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center z-40 hover:bg-opacity-90 transition-all" id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" aria-label="Back to top">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
+
+    <!-- Terms & Conditions Modal -->
+    <div class="modal-overlay" id="termsModal" role="dialog" aria-modal="true" aria-labelledby="termsModalTitle">
+        <div class="modal-content glass-card rounded-2xl max-w-2xl w-[90%] mx-auto mt-[6vh] max-h-[85vh] overflow-y-auto p-8 relative" style="background: var(--card);">
+            <button type="button" onclick="closeTermsModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors" aria-label="Close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 id="termsModalTitle" class="font-heading font-bold text-2xl mb-1">Terms &amp; Conditions</h3>
+            <p class="text-text-muted text-xs mb-6">ZIKO Web Design — Website Design &amp; Maintenance. Please read in full before accepting.</p>
+
+            <div class="space-y-4 text-sm text-text-secondary leading-relaxed">
+                <h4 class="font-heading font-bold text-white text-base mt-2">1. These Terms</h4>
+                <p>These Terms and Conditions ("Terms") govern the provision of website design, development, and maintenance services ("Services") by ZIKO ("the Developer", "I", "me") to the business or individual requesting the Services ("the Client", "you"). By ticking the acceptance box, requesting a quote, paying an invoice, or otherwise instructing the Developer to begin work, the Client agrees to be bound by these Terms.</p>
+                <p>These Terms form the whole agreement between the parties for the Services described in the accompanying quote or order form. Nothing here removes any statutory right the Client has that cannot lawfully be excluded.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">2. Services and Scope</h4>
+                <p>The specific website, package, and deliverables are set out in the quote, proposal, or order confirmation agreed with the Client before work begins ("the Project"). Typical packages include:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>Website Build — a one-off fee covering design, build, and delivery of an agreed number of pages, as set out in the quote.</li>
+                    <li>Monthly Maintenance — an ongoing rolling service covering updates, minor content changes, security monitoring, and support, as described in Clause 8.</li>
+                </ul>
+                <p>Any work, feature, or page not listed in the agreed quote is outside the scope of the Project and will be quoted separately before it is carried out. The Developer will always tell the Client the cost of extra work before starting it.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">3. Quotation, Approval, and Changes</h4>
+                <p>A price is only binding once confirmed in writing (email or messaging is sufficient). Verbal estimates given during an initial conversation are indicative only.</p>
+                <p>The Client will be shown a design draft or preview before final build work is completed, and may request reasonable changes at that stage.</p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>Two rounds of revisions to the agreed design are included in the Website Build fee.</li>
+                    <li>Further revision rounds, or changes requested after the Client has approved the final design, may be chargeable at the Developer's standard rate, quoted in advance.</li>
+                    <li>Requests that materially change the scope of the Project (e.g. adding new pages, e-commerce functionality, or custom features not in the original quote) will be treated as a new quote.</li>
+                </ul>
+
+                <h4 class="font-heading font-bold text-white text-base">4. Fees and Payment</h4>
+                <p>Unless otherwise agreed in writing:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>The Website Build fee is payable as set out in the quote (currently advertised from £50 for a standard build). Payment terms (e.g. deposit, full payment on completion) will be confirmed at the time of quoting.</li>
+                    <li>The Monthly Maintenance fee (currently £30/month) is billed monthly in advance, starting after any free introductory period has ended.</li>
+                    <li>Late payments may result in the Project being paused, the live site being taken offline, or maintenance being suspended, after reasonable notice has been given.</li>
+                    <li>All fees are quoted in pounds sterling (GBP). If the Developer becomes VAT-registered, VAT will be added and shown separately on invoices from that point.</li>
+                </ul>
+                <p>Where the Client is a consumer contracting away from the Developer's business premises (for example, following an in-person visit to the Client's shop or office), the cancellation rights in Clause 11 apply.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">5. Client Responsibilities</h4>
+                <p>To deliver the Project on time, the Developer needs the Client to:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>Provide text, images, logos, and other content needed for the site, or confirm the Developer should source placeholder/stock content instead.</li>
+                    <li>Respond to requests for feedback or approval within a reasonable time — delays here may extend the delivery timeline.</li>
+                    <li>Provide accurate business information and confirm they have the right to use any content, images, or trademarks they supply.</li>
+                    <li>Keep any login details, hosting accounts, or domain credentials shared with the Developer secure.</li>
+                </ul>
+                <p>The Client is responsible for ensuring that any content they supply (text, images, testimonials, claims about their products or services) is accurate, lawful, and does not infringe anyone else's rights. The Developer is not responsible for reviewing or fact-checking Client-supplied content.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">6. Intellectual Property and Ownership</h4>
+                <p>Once the Website Build fee has been paid in full, ownership of the final website's custom code and design, as built for the Client, transfers to the Client. Until full payment is received, all work remains the property of the Developer.</p>
+                <p>This transfer does not extend to:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>Third-party assets such as stock photos, icon sets, fonts, plugins, themes, or libraries, which remain subject to their own licence terms. The Developer will ensure any such assets used are licensed appropriately for the Client's use, and will inform the Client of any ongoing licence fees or attribution requirements.</li>
+                    <li>The Developer's own general tools, code snippets, boilerplate, or methods, which the Developer may reuse on other projects.</li>
+                </ul>
+                <p>The Developer may, unless the Client requests otherwise in writing, display the finished website in a portfolio and describe the nature of the work carried out for marketing purposes, without disclosing confidential business information.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">7. Hosting and Domains</h4>
+                <p>Unless hosting is included as part of a Maintenance Plan, the Client is responsible for purchasing and maintaining their own hosting and domain name. The Developer can advise on suitable providers and assist with setup for an agreed fee.</p>
+                <p>If the Developer purchases or manages a domain or hosting account on the Client's behalf, this will be documented in writing, including who holds the account login and who is responsible for renewal costs.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">8. Monthly Maintenance Plan</h4>
+                <p>Where the Client takes out the Monthly Maintenance Plan:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>The plan is billed monthly and may be cancelled by the Client at any time, with cancellation taking effect at the end of the current paid month. There is no minimum term or exit fee.</li>
+                    <li>The plan covers reasonable minor content updates (e.g. text or image swaps), security and software updates, monthly performance checks, backups, and bug fixes arising from normal use.</li>
+                    <li>The plan does not cover new page builds, redesigns, or new features — these are quoted separately.</li>
+                    <li>If the Client cancels and later wants to resume, current pricing at the time of resumption will apply.</li>
+                </ul>
+
+                <h4 class="font-heading font-bold text-white text-base">9. Data Protection</h4>
+                <p>Where the website collects personal data from visitors (for example, via a contact form), the Client is the data controller for that data and is responsible for complying with UK GDPR and the Data Protection Act 2018, including having a privacy policy on the site.</p>
+                <p>Where the Developer processes personal data on the Client's behalf (for example, by building or hosting a form that submits to a third-party service), the Developer acts as a data processor and will only use that data to provide the Services, will not use it for its own purposes, and will assist the Client in meeting its data protection obligations where reasonably possible.</p>
+                <p>The Developer will use appropriate technical measures to keep any Client or end-user data it handles secure, and will inform the Client without undue delay if it becomes aware of a personal data breach affecting the Project.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">10. Warranties and Liability</h4>
+                <p>The Developer will carry out the Services with reasonable care and skill, in line with the Consumer Rights Act 2015 (where applicable) and to a professional standard.</p>
+                <p>The Developer does not guarantee specific business outcomes, such as a particular volume of traffic, search engine ranking, or increase in sales, as these depend on many factors outside the Developer's control.</p>
+                <p>To the fullest extent permitted by law, the Developer's total liability arising out of or in connection with the Project is limited to the total fees paid by the Client for the Website Build in question. Nothing in these Terms limits liability for death or personal injury caused by negligence, fraud, or any other liability that cannot lawfully be limited or excluded.</p>
+                <p>The Developer is not liable for losses caused by third-party services (e.g. hosting providers, payment processors, plugin developers) failing or changing their terms, though the Developer will act reasonably to assist the Client in resolving such issues.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">11. Cancellation and Cooling-Off Rights</h4>
+                <p>If the Client is a consumer (i.e. acting for purposes outside a trade, business, or profession) and this agreement was entered into away from the Developer's business premises — for example, following an in-person conversation at the Client's premises — the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013 give the Client the right to cancel within 14 days of agreeing to the contract, without giving a reason.</p>
+                <p>If the Client wants work to begin within that 14-day period, the Developer will ask the Client to give express consent to this in writing, and to acknowledge that:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>Once the Developer has completed the Services in full within the 14-day period, with the Client's consent, the right to cancel is lost.</li>
+                    <li>If the Client cancels after work has started but before completion, they will be charged a reasonable amount for the work carried out up to the point of cancellation.</li>
+                </ul>
+                <p>Where the Client is contracting as a business (i.e. the Services are for their trade, business, craft, or profession), the statutory cancellation rights above do not apply, and cancellation is instead governed by Clause 12.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">12. Termination (Business Clients)</h4>
+                <p>Either party may terminate an agreed Project before completion by giving written notice. If the Client terminates, they will pay for all work completed up to that point, calculated on a fair and reasonable basis relative to the total agreed fee.</p>
+                <p>The Developer may pause or terminate the Project if the Client fails to pay an invoice within 14 days of it falling due, or fails to provide information or approvals needed to continue after being given reasonable notice and opportunity to respond.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">13. Confidentiality</h4>
+                <p>Each party agrees to keep confidential any non-public business information disclosed by the other in connection with the Project, and not to share it with third parties, except as needed to deliver the Services or as required by law.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">14. Force Majeure</h4>
+                <p>Neither party is liable for delay or failure to perform obligations caused by events outside their reasonable control, such as internet or power outages, illness, or third-party service failures. The affected party will inform the other as soon as reasonably possible and work to resume the Project promptly.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">15. General</h4>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>These Terms are governed by the laws of England and Wales, and both parties submit to the exclusive jurisdiction of the courts of England and Wales, unless the parties are based in Scotland or Northern Ireland, in which case the corresponding local law and courts apply.</li>
+                    <li>If any part of these Terms is found unenforceable, the rest will remain in effect.</li>
+                    <li>The Developer may update these Terms for future projects; any changes will not apply retroactively to a Project already agreed in writing.</li>
+                    <li>These Terms, together with the agreed quote or order confirmation, form the entire agreement between the parties for the Project.</li>
+                </ul>
+
+                <p class="text-text-muted text-xs pt-3 border-t border-white/10">This document is a template and does not constitute legal advice.</p>
+            </div>
+
+            <button type="button" onclick="acceptTermsFromModal()" class="glow-btn w-full mt-6 py-3 bg-primary text-white rounded-xl font-semibold">I Have Read &amp; Accept</button>
+        </div>
+    </div>
+
+    <script>
+        // Loading Screen
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.add('hidden');
+            }, 1200);
+        });
+
+        // Custom Cursor
+        const cursorDot = document.getElementById('cursorDot');
+        const cursorOutline = document.getElementById('cursorOutline');
+        let mouseX = 0, mouseY = 0;
+        let outlineX = 0, outlineY = 0;
+
+        if (window.matchMedia('(pointer: fine)').matches) {
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                cursorDot.style.left = mouseX + 'px';
+                cursorDot.style.top = mouseY + 'px';
+            });
+
+            function animateCursor() {
+                outlineX += (mouseX - outlineX) * 0.15;
+                outlineY += (mouseY - outlineY) * 0.15;
+                cursorOutline.style.left = outlineX + 'px';
+                cursorOutline.style.top = outlineY + 'px';
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+
+            document.querySelectorAll('a, button, .glass-card, .form-input, select, textarea').forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+            });
+        }
+
+        // Scroll Progress
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            document.getElementById('scrollProgress').style.width = scrollPercent + '%';
+        });
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('nav-blur');
+            } else {
+                navbar.classList.remove('nav-blur');
+            }
+        });
+
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 500) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        // Mobile Menu
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('open');
+            mobileMenu.classList.toggle('open');
+            hamburger.setAttribute('aria-expanded', mobileMenu.classList.contains('open'));
+        });
+
+        function closeMobileMenu() {
+            hamburger.classList.remove('open');
+            mobileMenu.classList.remove('open');
+            hamburger.setAttribute('aria-expanded', 'false');
+        }
+
+        // Intersection Observer for reveal animations
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+
+                    const counters = entry.target.querySelectorAll('.counter');
+                    counters.forEach(counter => {
+                        const target = parseInt(counter.getAttribute('data-target'));
+                        animateCounter(counter, target);
+                    });
+
+                    const progressBars = entry.target.querySelectorAll('.progress-fill');
+                    progressBars.forEach(bar => {
+                        const width = bar.getAttribute('data-width');
+                        if (width) bar.style.width = width + '%';
+                    });
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // Counter animation
+        function animateCounter(element, target) {
+            let current = 0;
+            const increment = target / 40;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 30);
+        }
+
+        // Accordion
+        function toggleAccordion(button) {
+            const item = button.parentElement;
+            const isActive = item.classList.contains('active');
+            document.querySelectorAll('.accordion-item').forEach(i => i.classList.remove('active'));
+            if (!isActive) item.classList.add('active');
+        }
+
+        // Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        // Ripple effect on buttons
+        document.querySelectorAll('.glow-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                ripple.style.left = (e.clientX - rect.left) + 'px';
+                ripple.style.top = (e.clientY - rect.top) + 'px';
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Typing animation phrases
+        const phrases = [
+            'React, Tailwind & Python Developer',
+            'Building Websites for Real People',
+            'Clean Code. Fair Prices. No Fluff.'
+        ];
+        let phraseIndex = 0;
+        const typingText = document.getElementById('typingText');
+
+        setInterval(() => {
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+            typingText.textContent = phrases[phraseIndex];
+            typingText.style.animation = 'none';
+            typingText.offsetHeight;
+            typingText.style.animation = 'typing 3.5s steps(30, end), blink-caret 0.75s step-end infinite';
+        }, 5000);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMobileMenu();
+            }
+        });
+
+        console.log('%c ZIKO Portfolio ', 'background: #978897; color: #23232A; font-size: 24px; font-weight: bold; padding: 10px;');
+        console.log('%c Built with honesty and clean code. ', 'color: #978897; font-size: 14px;');
+
+        // Terms & Conditions modal + acceptance gating
+        const termsCheckbox = document.getElementById('termsAccept');
+        const submitBtn = document.getElementById('submitBtn');
+        const termsAcceptanceField = document.getElementById('termsAcceptanceField');
+
+        function updateSubmitState() {
+            submitBtn.disabled = !termsCheckbox.checked;
+        }
+
+        termsCheckbox.addEventListener('change', updateSubmitState);
+        updateSubmitState();
+
+        function openTermsModal(e) {
+            if (e) e.preventDefault();
+            document.getElementById('termsModal').classList.add('open');
+        }
+
+        function closeTermsModal() {
+            document.getElementById('termsModal').classList.remove('open');
+        }
+
+        function acceptTermsFromModal() {
+            termsCheckbox.checked = true;
+            updateSubmitState();
+            closeTermsModal();
+        }
+
+        // Close modal on backdrop click or Escape
+        document.getElementById('termsModal').addEventListener('click', (e) => {
+            if (e.target.id === 'termsModal') closeTermsModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeTermsModal();
+        });
+
+        async function handleContactSubmit(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const button = document.getElementById('submitBtn');
+            const originalButtonText = button.innerHTML;
+
+            // Defense-in-depth: block submission server-side-equivalent if terms not checked
+            if (!termsCheckbox.checked) {
+                showCustomToast('Please accept the Terms & Conditions before sending.');
+                return;
+            }
+
+            // Embed a clear, explicit acceptance statement in the emailed submission
+            termsAcceptanceField.value = 'I accept the Terms & Conditions';
+
+            button.disabled = true;
+            button.innerHTML = '<span>Sending...</span>';
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    showCustomToast('Message sent successfully!');
+                    form.reset();
+                    updateSubmitState();
+                } else {
+                    const data = await response.json();
+                    showCustomToast(data.errors ? data.errors.map(e => e.message).join(', ') : 'Submission failed.');
+                }
+            } catch (error) {
+                showCustomToast('Could not connect to the server.');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalButtonText;
+            }
+        }
+
+        function showCustomToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+
+            if (toast && toastMessage) {
+                toastMessage.textContent = message;
+                toast.classList.add('show');
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 4000);
+            }
+        }
+    </script>
+</body>
+</html>
