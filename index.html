@@ -1159,8 +1159,8 @@
                 </div>
                 <p class="text-text-muted text-sm text-center">Built with passion. No fake experience, just real code.</p>
                 <div class="flex gap-6">
-                    <a href="#" class="text-text-muted hover:text-primary transition-colors text-sm">Privacy</a>
-                    <a href="#" class="text-text-muted hover:text-primary transition-colors text-sm">Terms</a>
+                    <button type="button" onclick="openPrivacyModal()" class="text-text-muted hover:text-primary transition-colors text-sm">Privacy</button>
+                    <button type="button" onclick="openTermsModal()" class="text-text-muted hover:text-primary transition-colors text-sm">Terms</button>
                 </div>
             </div>
             <div class="border-t border-white/10 mt-8 pt-8 text-center">
@@ -1288,6 +1288,68 @@
             </div>
 
             <button type="button" onclick="acceptTermsFromModal()" class="glow-btn w-full mt-6 py-3 bg-primary text-white rounded-xl font-semibold">I Have Read &amp; Accept</button>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div class="modal-overlay" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyModalTitle">
+        <div class="modal-content glass-card rounded-2xl max-w-2xl w-[90%] mx-auto mt-[6vh] max-h-[85vh] overflow-y-auto p-8 relative" style="background: var(--card);">
+            <button type="button" onclick="closePrivacyModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors" aria-label="Close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 id="privacyModalTitle" class="font-heading font-bold text-2xl mb-1">Privacy Policy</h3>
+            <p class="text-text-muted text-xs mb-6">ZIKO Web Design — last updated: ______________</p>
+
+            <div class="space-y-4 text-sm text-text-secondary leading-relaxed">
+                <h4 class="font-heading font-bold text-white text-base">Who this is</h4>
+                <p>This website is run by ZIKO ("I", "me"), an independent web designer. If you have any questions about this policy or how your information is handled, you can contact me at <a href="mailto:ziko.createwebsites@gmail.com" class="text-primary hover:underline">ziko.createwebsites@gmail.com</a>.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">What information I collect</h4>
+                <p>When you fill in the contact form on this site, I collect:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>Your name</li>
+                    <li>Your email address</li>
+                    <li>The type of project you've selected</li>
+                    <li>Any details you type into the message box</li>
+                    <li>Your confirmation that you've read the Terms &amp; Conditions</li>
+                </ul>
+                <p>I don't use tracking cookies, analytics, or advertising scripts on this site, so no other personal data is collected automatically while you browse.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">Cookies, analytics and ads</h4>
+                <p>This site may use the following, but only after you've given consent via the cookie banner shown when you first visit:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li><strong class="text-white">Google Analytics</strong> — helps me understand how visitors use the site (e.g. which pages are viewed, roughly how many visitors there are). This sets cookies and shares some data, including your approximate location and device type, with Google.</li>
+                    <li><strong class="text-white">Google Ads (AdSense)</strong> — may show ads on the site. This can set cookies used by Google and its advertising partners to show ads based on your visits to this and other sites.</li>
+                </ul>
+                <p>Neither of these loads unless you choose "Accept All" on the cookie banner. If you choose "Essential Only", no analytics or ad cookies are set, and only the cookies strictly needed for the site to function are used (this site currently sets none of those either).</p>
+                <p>You can change your choice at any time by clearing your browser's site data for this website, which will bring the cookie banner back on your next visit. You can also opt out of Google Analytics tracking generally using Google's <a href="https://tools.google.com/dlpage/gaoptout" class="text-primary hover:underline">browser opt-out add-on</a>, and manage ad personalisation via <a href="https://myadcenter.google.com" class="text-primary hover:underline">Google's Ad Settings</a>.</p>
+                <p>I also use <strong class="text-white">Google Search Console</strong> to check how this site appears in Google Search results. This does not set any cookies on your device or collect any personal data about you as a visitor — it only shows me aggregated, anonymous search statistics.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">How I use it</h4>
+                <p>Your information is used only to:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>Reply to your enquiry and discuss your project</li>
+                    <li>Prepare a quote and, if you go ahead, deliver the agreed work</li>
+                    <li>Keep a record of what was agreed, in case of any dispute</li>
+                </ul>
+                <p>I don't sell, rent, or share your enquiry information with third parties for marketing purposes, and I don't use it for anything beyond responding to your enquiry and delivering the Services if you choose to proceed. This is separate from the analytics/ads cookies described below, which only apply to general site browsing, not to information you submit through the contact form.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">Where it's stored</h4>
+                <p>Form submissions are processed using Formspree, a third-party form-handling service, which sends your enquiry to my email inbox. Formspree may store submission data on its own servers as part of providing that service — you can read their own privacy policy on their website for details of how they handle it.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">How long it's kept</h4>
+                <p>I keep enquiry and project information for as long as reasonably needed to deliver the Services and handle any follow-up (such as maintenance or support requests), and I delete or anonymise it once it's no longer needed, unless I'm required to keep records for a longer period (for example, for tax purposes).</p>
+
+                <h4 class="font-heading font-bold text-white text-base">Your rights</h4>
+                <p>Under UK data protection law, you have the right to ask what personal data I hold about you, to ask me to correct or delete it, and to object to how it's used. To exercise any of these, just email me at the address above and I'll sort it out as quickly as I can.</p>
+
+                <h4 class="font-heading font-bold text-white text-base">Changes to this policy</h4>
+                <p>If this policy changes, an updated version will be posted here. Continuing to use this site after a change means you accept the updated policy.</p>
+
+                <p class="text-text-muted text-xs pt-3 border-t border-white/10">This policy is written in plain language for a small, independent project and does not constitute legal advice.</p>
+            </div>
+
+            <button type="button" onclick="closePrivacyModal()" class="glow-btn w-full mt-6 py-3 bg-primary text-white rounded-xl font-semibold">Close</button>
         </div>
     </div>
 
@@ -1504,12 +1566,27 @@
             closeTermsModal();
         }
 
+        function openPrivacyModal(e) {
+            if (e) e.preventDefault();
+            document.getElementById('privacyModal').classList.add('open');
+        }
+
+        function closePrivacyModal() {
+            document.getElementById('privacyModal').classList.remove('open');
+        }
+
         // Close modal on backdrop click or Escape
         document.getElementById('termsModal').addEventListener('click', (e) => {
             if (e.target.id === 'termsModal') closeTermsModal();
         });
+        document.getElementById('privacyModal').addEventListener('click', (e) => {
+            if (e.target.id === 'privacyModal') closePrivacyModal();
+        });
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeTermsModal();
+            if (e.key === 'Escape') {
+                closeTermsModal();
+                closePrivacyModal();
+            }
         });
 
         async function handleContactSubmit(event) {
@@ -1572,5 +1649,73 @@
             }
         }
     </script>
+    <!-- Cookie Consent Banner -->
+    <div id="cookieBanner" class="fixed bottom-0 left-0 right-0 z-[9997] p-4 sm:p-6" style="display: none;">
+        <div class="max-w-3xl mx-auto glass-card rounded-2xl p-5 sm:p-6 shadow-2xl" style="background: var(--card);">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <p class="text-sm text-text-secondary flex-1">
+                    This site uses cookies for analytics and to show relevant ads. You can accept all, or continue with only the cookies needed for the site to work. See the
+                    <button type="button" onclick="openPrivacyModal()" class="text-primary hover:underline">Privacy Policy</button> for details.
+                </p>
+                <div class="flex gap-2 flex-shrink-0 w-full sm:w-auto">
+                    <button type="button" onclick="setCookieConsent('essential')" class="flex-1 sm:flex-none px-4 py-2.5 rounded-full text-sm font-semibold border border-white/20 hover:bg-white/5 transition-all">Essential Only</button>
+                    <button type="button" onclick="setCookieConsent('all')" class="glow-btn flex-1 sm:flex-none px-5 py-2.5 rounded-full text-sm font-semibold bg-primary text-white">Accept All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+        Analytics / Ads placeholder — scripts only load after consent (see setCookieConsent()).
+        Replace G-XXXXXXXXXX and ca-pub-XXXXXXXXXXXXXXXX with your real IDs before publishing.
+        NOTE: An AdSense account must be held by someone 18+. If you're under 18, this needs
+        to be set up under a parent/guardian's Google account, with payments going to them.
+    -->
+    <script>
+        function loadGoogleAnalytics() {
+            if (window.gaLoaded) return;
+            window.gaLoaded = true;
+            const s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX'; // <-- your GA4 Measurement ID
+            document.head.appendChild(s);
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){ dataLayer.push(arguments); }
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', 'G-XXXXXXXXXX');
+        }
+
+        function loadGoogleAds() {
+            if (window.adsLoaded) return;
+            window.adsLoaded = true;
+            const s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX'; // <-- your AdSense publisher ID
+            s.crossOrigin = 'anonymous';
+            document.head.appendChild(s);
+        }
+
+        function setCookieConsent(choice) {
+            localStorage.setItem('ziko_cookie_consent', choice);
+            document.getElementById('cookieBanner').style.display = 'none';
+            if (choice === 'all') {
+                loadGoogleAnalytics();
+                loadGoogleAds();
+            }
+        }
+
+        // On load: show the banner unless a choice was already made, and respect a stored "all" choice
+        window.addEventListener('DOMContentLoaded', () => {
+            const stored = localStorage.getItem('ziko_cookie_consent');
+            if (!stored) {
+                document.getElementById('cookieBanner').style.display = 'block';
+            } else if (stored === 'all') {
+                loadGoogleAnalytics();
+                loadGoogleAds();
+            }
+        });
+    </script>
+
 </body>
 </html>
